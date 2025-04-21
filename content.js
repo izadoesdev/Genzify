@@ -16,6 +16,20 @@ class ArticleSplitter {
         window.speechSynthesis.cancel();
       }
     });
+
+    // Add navigation event listeners
+    window.addEventListener('popstate', () => {
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+      }
+    });
+
+    // Listen for clicks on links
+    document.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A' && window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+      }
+    });
     
     this.init();
   }
@@ -61,7 +75,7 @@ class ArticleSplitter {
       .replace(/\s*([.,!?])\s*/g, '$1 ')
       .replace(/\s+/g, ' ');
 
-    const slangWords = ['bomboclat', 'no cap', 'fr fr', 'slay', 'based', 'sus', 'lit', 'vibing', 'poggers', 'sheesh', 'mama a girl behind you'];
+    const slangWords = ['bomboclat', 'no cap', 'slay', 'based', 'sussy', 'lit', 'vibing', 'poggers', 'mama a girl behind you', 'mama a girl behind you hitting the boogie'];
     const randomSlang = [];
     while (randomSlang.length < 10) {
       const word = slangWords[Math.floor(Math.random() * slangWords.length)];
@@ -190,7 +204,11 @@ class ArticleSplitter {
     const article = document.querySelector('article');
     if (!article) return;
 
-    // Create container for the split layout
+    // Clean up any existing speech synthesis
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+    }
+
     const splitContainer = document.createElement('div');
     splitContainer.className = 'genzify-split-container';
     splitContainer.style.cssText = `
@@ -206,7 +224,6 @@ class ArticleSplitter {
       overflow: hidden;
     `;
 
-    // Create top half for article
     const topHalf = document.createElement('div');
     topHalf.className = 'genzify-top-half';
     topHalf.style.cssText = `
@@ -217,7 +234,6 @@ class ArticleSplitter {
       position: relative;
     `;
 
-    // Create bottom half for video
     const bottomHalf = document.createElement('div');
     bottomHalf.className = 'genzify-bottom-half';
     bottomHalf.style.cssText = `
@@ -230,7 +246,6 @@ class ArticleSplitter {
       overflow: hidden;
     `;
 
-    // Create video element
     const video = document.createElement('video');
     video.src = chrome.runtime.getURL('videos/subwaysurferhd.mp4');
     video.style.cssText = `
@@ -246,17 +261,14 @@ class ArticleSplitter {
     video.loop = true;
     video.muted = true;
 
-    // Create speech controls
     const speechControls = this.createSpeechControls();
 
-    // Assemble the components
     bottomHalf.appendChild(video);
     topHalf.appendChild(speechControls);
     splitContainer.appendChild(topHalf);
     splitContainer.appendChild(bottomHalf);
     document.body.appendChild(splitContainer);
 
-    // Move article content to top half
     const articleContent = article.cloneNode(true);
     topHalf.appendChild(articleContent);
   }
