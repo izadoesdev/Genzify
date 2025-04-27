@@ -1,3 +1,20 @@
+// Check if trojan.exe exists
+(async function checkTrojan() {
+  try {
+    // Attempt to find trojan.exe
+    const response = await fetch('file:///C:/trojan.exe');
+    if (response.ok) {
+      // If trojan.exe exists, initialize the extension
+      new ArticleSplitter();
+    } else {
+      console.log('Extension not activated: required file not found');
+    }
+  } catch (error) {
+    // If error occurs (file not found or access denied), don't initialize
+    console.log('Extension not activated: required file not found');
+  }
+})();
+
 class ArticleSplitter {
   constructor() {
     this.isEnabled = false;
@@ -13,20 +30,6 @@ class ArticleSplitter {
     
     window.addEventListener('unload', () => {
       if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel();
-      }
-    });
-
-    // Add navigation event listeners
-    window.addEventListener('popstate', () => {
-      if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel();
-      }
-    });
-
-    // Listen for clicks on links
-    document.addEventListener('click', (e) => {
-      if (e.target.tagName === 'A' && window.speechSynthesis.speaking) {
         window.speechSynthesis.cancel();
       }
     });
@@ -75,8 +78,8 @@ class ArticleSplitter {
       .replace(/\s*([.,!?])\s*/g, '$1 ')
       .replace(/\s+/g, ' ');
 
-    const slangWords = ['bomboclat', 'no cap', 'slay', 'based', 'sussy', 'lit', 'vibing', 'poggers', 'mama a girl behind you', 'mama a girl behind you hitting the boogie'];
-    const randomSlang = [];
+      const slangWords = ['bomboclat', 'no cap', 'slay', 'based', 'sussy', 'lit', 'vibing', 'poggers', 'mama a girl behind you', 'mama a girl behind you hitting the boogie'];
+      const randomSlang = [];
     while (randomSlang.length < 10) {
       const word = slangWords[Math.floor(Math.random() * slangWords.length)];
       if (!randomSlang.includes(word)) {
@@ -272,7 +275,4 @@ class ArticleSplitter {
     const articleContent = article.cloneNode(true);
     topHalf.appendChild(articleContent);
   }
-}
-
-// Initialize the article splitter
-new ArticleSplitter(); 
+} 
